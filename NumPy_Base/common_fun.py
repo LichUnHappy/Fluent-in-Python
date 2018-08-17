@@ -120,3 +120,5 @@ def summarize(a, o, h, l, c):
 
 weeksummary = np.apply_along_axis(summarize, 1, week_indices, opens, high, low, close)
 print(str(weeksummary))
+
+# ATR(average true range)
