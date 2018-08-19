@@ -90,35 +90,82 @@ from datetime import datetime
 
 # 汇总数据
 ## 周汇总
-def datestr2num(s):
-    return datetime.strptime(s.decode('ascii'), "%Y-%m-%d").date().weekday()
+# def datestr2num(s):
+#     return datetime.strptime(s.decode('ascii'), "%Y-%m-%d").date().weekday()
 
-dates, opens, high, low, close = np.loadtxt('aapl.csv', delimiter=',', usecols=(0,1,2,3,4), converters={0:datestr2num}, unpack=True)
+# dates, opens, high, low, close = np.loadtxt('aapl.csv', delimiter=',', usecols=(0,1,2,3,4), converters={0:datestr2num}, unpack=True)
 
-close = close[:16]
-dates = dates[:16]
+# close = close[:16]
+# dates = dates[:16]
 
-first_Monday = np.ravel(np.where(dates == 0))[0]
-# print("This is the 1st Monday: " + str(first_Monday))
+# first_Monday = np.ravel(np.where(dates == 0))[0]
+# # print("This is the 1st Monday: " + str(first_Monday))
 
-last_Friday = np.ravel(np.where(dates == 4))[-1]
-# print("This is the last Friday: " + str(last_Friday)) 
+# last_Friday = np.ravel(np.where(dates == 4))[-1]
+# # print("This is the last Friday: " + str(last_Friday)) 
 
-week_indices = np.arange(first_Monday, last_Friday + 1)
-print("Weeks indices initial is " + str(week_indices))
+# week_indices = np.arange(first_Monday, last_Friday + 1)
+# print("Weeks indices initial is " + str(week_indices))
 
-week_indices = np.split(week_indices, 3)
-print("Weeks indices after split " + str(week_indices))
+# week_indices = np.split(week_indices, 3)
+# print("Weeks indices after split " + str(week_indices))
 
-def summarize(a, o, h, l, c):
-    monday_open = o[a[0]]
-    week_high = np.max( np.take(h, a))
-    week_low = np.min(np.take(l,a))
-    friday_close = c[a[-1]]
+# def summarize(a, o, h, l, c):
+#     monday_open = o[a[0]]
+#     week_high = np.max( np.take(h, a))
+#     week_low = np.min(np.take(l,a))
+#     friday_close = c[a[-1]]
 
-    return("APPL "+ str(monday_open) + str(week_high) + str(week_low) + str(friday_close))
+#     return("APPL "+ str(monday_open) + str(week_high) + str(week_low) + str(friday_close))
 
-weeksummary = np.apply_along_axis(summarize, 1, week_indices, opens, high, low, close)
-print(str(weeksummary))
+# weeksummary = np.apply_along_axis(summarize, 1, week_indices, opens, high, low, close)
+# print(str(weeksummary))
 
 # ATR(average true range)
+# h, l, c = np.loadtxt('aapl.csv', delimiter=',', usecols=(2, 3, 4),
+# unpack=True)
+
+# N = 5
+# h = h[-N:]
+# l = l[-N:]
+
+# print("len(h)", len(h), "len(l)", len(l))
+# print("Close", c)
+# previousclose = c[-N -1: -1]
+
+# print("len(previousclose)", len(previousclose))
+# print("Previous close", previousclose)
+# truerange = np.maximum(h - l, h - previousclose, previousclose - l)
+# print("True range", truerange)
+# atr = np.zeros(N)
+# atr[0] = np.mean(truerange)
+
+# for i in range(1, N):
+#     atr[i] = (N - 1) * atr[i - 1] + truerange[i]
+#     atr[i] /= N
+# print("ATR", atr)
+
+# Simple moving average
+import matplotlib.pyplot as plt
+
+# N = 300
+# weights = np.ones(N) / N
+# print("Weights", weights)
+
+# c = np.loadtxt('aapl.csv', delimiter=',', usecols=(3), unpack=True)
+# # convolove
+# sma = np.convolve(weights, c)[N-1:-N+1]
+# t = np.arange(N - 1, len(c))
+
+# plt.plot(t, c[N-1:], lw=1.0, label="Data")
+# plt.plot(t, sma, '--', lw=2.0, label="Moving average")
+
+# plt.title("5 Day Moving Average")
+# plt.xlabel("Days")
+# plt.ylabel("Price ($)")
+# plt.grid()
+# plt.legend()
+# plt.show()
+
+# exponential moving average
+
