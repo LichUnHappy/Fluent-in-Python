@@ -168,4 +168,137 @@ import matplotlib.pyplot as plt
 # plt.show()
 
 # exponential moving average
+# x = np.arange(5)
+# print("Exp", np.exp(x))
+# print("Linspace", np.linspace(-1, 0, 5))
 
+# # Calculate weights
+# N = 5
+# weights = np.exp(np.linspace(-1., 0., N))
+
+# # Normalize weights
+# weights /= weights.sum()
+# print("Weights", weights)
+
+# c = np.loadtxt('aapl.csv', delimiter=',', usecols=3, unpack=True)
+# ema = np.convolve(weights, c)[N-1:-N+1]
+# t = np.arange(N - 1, len(c))
+# plt.plot(t, c[N-1:], lw=1.0, label='Data')
+# plt.plot(t, ema, '--', lw=2.0, label='Exponential Moving Average')
+# plt.title('5 Days Exponential Moving Average')
+# plt.xlabel('Days')
+# plt.ylabel('Price ($)')
+# plt.legend()
+# plt.grid()
+# plt.show()
+
+# N = 5
+# weights = np.ones(N) / N
+# print("Weights", weights)
+
+# c = np.loadtxt('aapl.csv', delimiter=',', usecols=(3), unpack=True)
+# sma = np.convolve(weights, c)[N-1:-N+1]
+
+# deviation = []
+# C = len(c)
+# for i in range(N - 1, C):
+#     if i + N < C:
+#         dev = c[i: i + N]
+#     else:
+#         dev = c[-N:]
+
+#     averages = np.zeros(N)
+#     averages.fill(sma[i - N - 1])
+#     dev = dev - averages
+#     dev = dev ** 2
+#     dev = np.sqrt(np.mean(dev))
+#     deviation.append(dev)
+
+# deviation = 2 * np.array(deviation)
+# print(len(deviation), len(sma))
+
+# upperBB = sma + deviation
+# lowerBB = sma - deviation
+# c_slice = c[N-1:]
+# between_bands = np.where((c_slice < upperBB) & (c_slice > lowerBB))
+# print(lowerBB[between_bands])
+# print(c[between_bands])
+# print(upperBB[between_bands])
+
+# between_bands = len(np.ravel(between_bands))
+# print("Ratio between bands", float(between_bands)/len(c_slice))
+
+# t = np.arange(N - 1, C)
+# plt.plot(t, c_slice, lw=1.0, label='Data')
+# plt.plot(t, sma, '--', lw=2.0, label='Moving Average')
+# plt.plot(t, upperBB, '-.', lw=3.0, label='Upper Band')
+# plt.plot(t, lowerBB, ':', lw=4.0, label='Lower Band')
+# plt.title('Bollinger Bands')
+# plt.xlabel('Days')
+# plt.ylabel('Price ($)')
+# plt.grid()
+# plt.legend()
+# plt.show()
+
+# linear model
+# N = 5
+# c = np.loadtxt('aapl.csv', delimiter=',', usecols=(3), unpack=True)
+# b = c[-N:]
+# b = b[::-1]
+# print("b", b)
+# A = np.zeros((N, N), float)
+# print("Zeros N by N", A)
+# for i in range(N):
+#     A[i, ] = c[-N - 1 - i: - 1 - i]
+# print("A", A)
+
+# (x, residuals, rank, s) = np.linalg.lstsq(A, b)
+# print(x, residuals, rank, s)
+
+# print("Predict Now")
+# print(np.dot(b, x))
+
+# Trend Lines
+def fit_line(t, y):
+    A = np.vstack([t, np.ones_like(t)]).T
+    
+    return np.linalg.lstsq(A, y)[0]
+
+# Determine pivots
+h, l, c = np.loadtxt('aapl.csv', delimiter=',', usecols=(2,3,4),
+unpack=True)
+pivots = (h + l + c) / 3
+print("Pivots", pivots)
+
+# Fit trend lines
+t = np.arange(len(c))
+sa, sb = fit_line(t, pivots - (h - l))
+ra, rb = fit_line(t, pivots + (h - l))
+support = sa * t + sb
+resistance = ra * t + rb
+condition = (c > support) & (c < resistance)
+print("Condition", condition)
+between_bands = np.where(condition)
+print(support[between_bands])
+print(c[between_bands])
+print(resistance[between_bands])
+between_bands = len(np.ravel(between_bands))
+print("Number points between bands", between_bands)
+print("Ratio between bands", float(between_bands)/len(c))
+print("Tomorrows support", sa * (t[-1] + 1) + sb)
+print("Tomorrows resistance", ra * (t[-1] + 1) + rb)
+a1 = c[c > support]
+a2 = c[c < resistance]
+print("Number of points between bands 2nd approach" ,len(np.
+intersect1d(a1, a2)))
+
+# Plotting
+plt.plot(t, c, label='Data')
+plt.plot(t, support, '--', lw=2.0, label='Support')
+plt.plot(t, resistance, '-.', lw=3.0, label='Resistance')
+plt.title('Trend Lines')
+plt.xlabel('Days')
+plt.ylabel('Price ($)')
+plt.grid()
+plt.legend()
+plt.show()
